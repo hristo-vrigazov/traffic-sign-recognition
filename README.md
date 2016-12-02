@@ -11,4 +11,5 @@ $ conda env create -f environment.yml
 $ conda install --name CarND-TensorFlow-Lab -c conda-forge tensorflow
 (CarND-TensorFlow-Lab) $ conda install -c https://conda.anaconda.org/menpo opencv3
 (CarND-TensorFlow-Lab) $ pip install click
+(CarND-TensorFlow-Lab) $ pip install wget
 ```
