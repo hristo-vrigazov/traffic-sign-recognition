@@ -28,7 +28,7 @@ def load_dataset():
 	training_file = 'train.p'
 	testing_file = 'test.p'
 
-	if not os.path.isfile(training_file) or not ps.path.isfile(testing_file):
+	if not os.path.isfile(training_file) or not os.path.isfile(testing_file):
 		url = 'https://d17h27t6h515a5.cloudfront.net/topher/2016/November/581faac4_traffic-signs-data/traffic-signs-data.zip'
 		filename = wget.download(url)
 		unzip(filename, '.')
