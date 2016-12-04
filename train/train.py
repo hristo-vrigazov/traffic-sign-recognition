@@ -1,12 +1,13 @@
 from load_dataset import load_dataset
+from load_dataset import load_grayscale
 
 import tensorflow as tf
 import numpy as np
 
 class Trainer:
 
-    def __init__(self):
-        self.X_train, self.y_train, self.X_test, self.y_test = load_dataset()
+    def __init__(self, dataset_loading_function):
+        self.X_train, self.y_train, self.X_test, self.y_test = dataset_loading_function()
         self.n_train = len(self.X_train)
         self.n_test = len(self.X_test)
         self.image_size = self.X_train[0].shape[0]
@@ -77,4 +78,4 @@ class Trainer:
 
 
 if __name__ == "__main__":
-    Trainer().train()
+    Trainer(load_grayscale).train()

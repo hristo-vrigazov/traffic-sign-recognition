@@ -27,14 +27,15 @@ def unzip(source_filename, dest_dir):
             zf.extract(member, path)
 
 
+def grayscale(img):
+    return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+
 def load_grayscale():
     X_train, y_train, X_test, y_test = load_dataset()
 
-    for i in range(len(X_train)):
-        X_train[i] = cv2.cvtColor(X_train[i], cv2.COLOR_BGR2GRAY).reshape(32,32,1)
-
-    for i in range(len(X_test)):
-        X_test[i] = cv2.cvtColor(X_test[i], cv2.COLOR_BGR2GRAY).reshape(32,32,1)
+    X_train = np.array([grayscale(img) for img in X_train]).reshape(-1,32,32,1)
+    X_test = np.array([grayscale(img) for img in X_test]).reshape(-1,32,32,1)
 
     return X_train, y_train, X_test, y_test
 
