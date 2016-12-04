@@ -28,7 +28,7 @@ def unzip(source_filename, dest_dir):
 
 
 def grayscale(img):
-    return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    return cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 
 
 def load_grayscale():
@@ -38,6 +38,17 @@ def load_grayscale():
     X_test = np.array([grayscale(img) for img in X_test]).reshape(-1,32,32,1)
 
     return X_train, y_train, X_test, y_test, X_validation, y_validation
+
+
+def shuffle_in_unison(a, b):
+    assert len(a) == len(b)
+    shuffled_a = np.empty(a.shape, dtype=a.dtype)
+    shuffled_b = np.empty(b.shape, dtype=b.dtype)
+    permutation = np.random.permutation(len(a))
+    for old_index, new_index in enumerate(permutation):
+        shuffled_a[new_index] = a[old_index]
+        shuffled_b[new_index] = b[old_index]
+    return shuffled_a, shuffled_b
 
 
 def load_dataset():
@@ -62,5 +73,9 @@ def load_dataset():
     
     del train
     del test
+
+    X_train, y_train = shuffle_in_unison(X_train, y_train)
+    X_test, y_test = shuffle_in_unison(X_test, y_test)
+    X_validation, y_validation = shuffle_in_unison(X_validation, y_validation)
 
     return X_train, y_train, X_test, y_test, X_validation, y_validation

@@ -21,15 +21,15 @@ class Trainer:
     def _reformat(self, dataset, labels):
         dataset = dataset.reshape(
             (-1, self.image_size, self.image_size, self.n_channels)).astype(np.float32)
-        labels = (np.arange(self.n_channels) == labels[:,None]).astype(np.float32)
+        labels = (np.arange(self.n_classes) == labels[:,None]).astype(np.float32)
         return dataset, labels
 
-    def _accuracy(predictions, labels):
+    def _accuracy(self, predictions, labels):
         return (100.0 * np.sum(np.argmax(predictions, 1) == np.argmax(labels, 1)) / predictions.shape[0])
 
     def train(self):
         image_size = self.image_size
-        num_labels = 42
+        num_labels = self.n_classes
         num_channels = self.n_channels
 
         print('Image size {}'.format(image_size))
@@ -109,10 +109,10 @@ class Trainer:
                     _, l, predictions = session.run([optimizer, loss, train_prediction], feed_dict=feed_dict)
                     if (step % 50 == 0):
                         print('Minibatch loss at step %d: %f' % (step, l))
-                        print('Minibatch accuracy: %.1f%%' % accuracy(predictions, batch_labels))
-                        print('Validation accuracy: %.1f%%' % accuracy(
+                        print('Minibatch accuracy: %.1f%%' % self._accuracy(predictions, batch_labels))
+                        print('Validation accuracy: %.1f%%' % self._accuracy(
                         valid_prediction.eval(), valid_labels))
-                print('Test accuracy: %.1f%%' % accuracy(test_prediction.eval(), test_labels))
+                print('Test accuracy: %.1f%%' % self._accuracy(test_prediction.eval(), test_labels))
 
 
 if __name__ == "__main__":
