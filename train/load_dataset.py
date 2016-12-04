@@ -32,12 +32,12 @@ def grayscale(img):
 
 
 def load_grayscale():
-    X_train, y_train, X_test, y_test = load_dataset()
+    X_train, y_train, X_test, y_test, X_validation, y_validation = load_dataset()
 
     X_train = np.array([grayscale(img) for img in X_train]).reshape(-1,32,32,1)
     X_test = np.array([grayscale(img) for img in X_test]).reshape(-1,32,32,1)
 
-    return X_train, y_train, X_test, y_test
+    return X_train, y_train, X_test, y_test, X_validation, y_validation
 
 
 def load_dataset():
@@ -55,10 +55,12 @@ def load_dataset():
     with open(testing_file, mode='rb') as f:
         test = pickle.load(f)
 
-    X_train, y_train = train['features'], train['labels']
+    validation_train_limit = int(len(train['features']) * 9.0 / 10.0)
+    X_train, y_train = train['features'][:validation_train_limit], train['labels'][:validation_train_limit]
     X_test, y_test = test['features'], test['labels']
+    X_validation, y_validation = train['features'][validation_train_limit:], train['labels'][validation_train_limit:]
     
     del train
     del test
 
-    return X_train, y_train, X_test, y_test
+    return X_train, y_train, X_test, y_test, X_validation, y_validation
