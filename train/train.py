@@ -11,21 +11,37 @@ class Trainer:
         self.n_train = len(self.X_train)
         self.n_test = len(self.X_test)
         self.image_size = self.X_train[0].shape[0]
-        self.n_classes = len(set(self.y_train))
+        self.n_classes = 42
         self.n_channels = self.X_train[0].shape[2]
 
         print('Training examples: {}'.format(len(self.X_train)))
         print('Test examples: {}'.format(len(self.X_test)))
         print('Validation examples: {}'.format(len(self.X_validation)))
 
+    def _reformat(self, dataset, labels):
+        dataset = dataset.reshape(
+            (-1, self.image_size, self.image_size, self.n_channels)).astype(np.float32)
+        labels = (np.arange(self.n_channels) == labels[:,None]).astype(np.float32)
+        return dataset, labels
+
+    def _accuracy(predictions, labels):
+        return (100.0 * np.sum(np.argmax(predictions, 1) == np.argmax(labels, 1)) / predictions.shape[0])
+
     def train(self):
         image_size = self.image_size
-        num_labels = self.n_classes
+        num_labels = 42
         num_channels = self.n_channels
 
         print('Image size {}'.format(image_size))
         print('Num labels {}'.format(num_labels))
         print('Num channels {}'.format(num_channels))
+
+        train_dataset, train_labels = self._reformat(self.X_train, self.y_train)
+        valid_dataset, valid_labels = self._reformat(self.X_validation, self.y_validation)
+        test_dataset, test_labels = self._reformat(self.X_test, self.y_test)
+        print('Training set', train_dataset.shape, train_labels.shape)
+        print('Validation set', valid_dataset.shape, valid_labels.shape)
+        print('Test set', test_dataset.shape, test_labels.shape)
 
         batch_size = 16
         patch_size = 5
@@ -42,7 +58,7 @@ class Trainer:
             tf_valid_dataset = tf.constant(valid_dataset)
             tf_test_dataset = tf.constant(test_dataset)
           
-            # Variables.
+            # Initialize variables
             layer1_weights = tf.Variable(tf.truncated_normal(
                 [patch_size, patch_size, num_channels, depth], stddev=0.1))
             layer1_biases = tf.Variable(tf.zeros([depth]))
@@ -56,7 +72,7 @@ class Trainer:
               [num_hidden, num_labels], stddev=0.1))
             layer4_biases = tf.Variable(tf.constant(1.0, shape=[num_labels]))
           
-          # Model.
+            # Model.
             def model(data):
                 conv = tf.nn.conv2d(data, layer1_weights, [1, 2, 2, 1], padding='SAME')
                 hidden = tf.nn.relu(conv + layer1_biases)
@@ -79,6 +95,24 @@ class Trainer:
             train_prediction = tf.nn.softmax(logits)
             valid_prediction = tf.nn.softmax(model(tf_valid_dataset))
             test_prediction = tf.nn.softmax(model(tf_test_dataset))
+
+            num_steps = 1001
+
+            with tf.Session(graph=graph) as session:
+                tf.initialize_all_variables().run()
+                print('Initialized')
+                for step in range(num_steps):
+                    offset = (step * batch_size) % (train_labels.shape[0] - batch_size)
+                    batch_data = train_dataset[offset:(offset + batch_size), :, :, :]
+                    batch_labels = train_labels[offset:(offset + batch_size), :]
+                    feed_dict = {tf_train_dataset : batch_data, tf_train_labels : batch_labels}
+                    _, l, predictions = session.run([optimizer, loss, train_prediction], feed_dict=feed_dict)
+                    if (step % 50 == 0):
+                        print('Minibatch loss at step %d: %f' % (step, l))
+                        print('Minibatch accuracy: %.1f%%' % accuracy(predictions, batch_labels))
+                        print('Validation accuracy: %.1f%%' % accuracy(
+                        valid_prediction.eval(), valid_labels))
+                print('Test accuracy: %.1f%%' % accuracy(test_prediction.eval(), test_labels))
 
 
 if __name__ == "__main__":
