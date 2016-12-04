@@ -21,6 +21,7 @@ class Trainer:
         print('Image size {}'.format(image_size))
         print('Num labels {}'.format(num_labels))
         print('Num channels {}'.format(num_channels))
+
         # batch_size = 16
         # patch_size = 5
         # depth = 16
