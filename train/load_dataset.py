@@ -66,10 +66,10 @@ def load_dataset():
     with open(testing_file, mode='rb') as f:
         test = pickle.load(f)
 
-    validation_train_limit = int(len(train['features']) * 9.0 / 10.0)
-    X_train, y_train = train['features'][:validation_train_limit], train['labels'][:validation_train_limit]
-    X_test, y_test = test['features'], test['labels']
-    X_validation, y_validation = train['features'][validation_train_limit:], train['labels'][validation_train_limit:]
+    validation_test_limit = int(len(test['features']) * 9.0 / 10.0)
+    X_train, y_train = train['features'], train['labels']
+    X_test, y_test = test['features'][:validation_test_limit], test['labels'][:validation_test_limit]
+    X_validation, y_validation = test['features'][validation_test_limit:], test['labels'][validation_test_limit:]
     
     del train
     del test

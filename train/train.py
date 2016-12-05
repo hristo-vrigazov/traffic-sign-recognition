@@ -43,7 +43,7 @@ class Trainer:
         print('Validation set', valid_dataset.shape, valid_labels.shape)
         print('Test set', test_dataset.shape, test_labels.shape)
 
-        batch_size = 16
+        batch_size = 128
         patch_size = 5
         depth = 16
         num_hidden = 64
@@ -60,13 +60,13 @@ class Trainer:
           
             # Initialize variables
             layer1_weights = tf.Variable(tf.truncated_normal(
-                [patch_size, patch_size, num_channels, depth], stddev=0.1))
+                [patch_size, patch_size, num_channels, depth], stddev=0.001))
             layer1_biases = tf.Variable(tf.zeros([depth]))
             layer2_weights = tf.Variable(tf.truncated_normal(
               [patch_size, patch_size, depth, depth], stddev=0.1))
             layer2_biases = tf.Variable(tf.constant(1.0, shape=[depth]))
             layer3_weights = tf.Variable(tf.truncated_normal(
-              [image_size // 4 * image_size // 4 * depth, num_hidden], stddev=0.1))
+              [image_size // 4 * image_size // 4 * depth, num_hidden], stddev=0.001))
             layer3_biases = tf.Variable(tf.constant(1.0, shape=[num_hidden]))
             layer4_weights = tf.Variable(tf.truncated_normal(
               [num_hidden, num_labels], stddev=0.1))
@@ -89,7 +89,7 @@ class Trainer:
                 tf.nn.softmax_cross_entropy_with_logits(logits, tf_train_labels))
             
           # Optimizer.
-            optimizer = tf.train.GradientDescentOptimizer(0.05).minimize(loss)
+            optimizer = tf.train.GradientDescentOptimizer(0.001).minimize(loss)
           
           # Predictions for the training, validation, and test data.
             train_prediction = tf.nn.softmax(logits)
@@ -110,8 +110,9 @@ class Trainer:
                     if (step % 50 == 0):
                         print('Minibatch loss at step %d: %f' % (step, l))
                         print('Minibatch accuracy: %.1f%%' % self._accuracy(predictions, batch_labels))
-                        print('Validation accuracy: %.1f%%' % self._accuracy(
-                        valid_prediction.eval(), valid_labels))
+                        print('Test accuracy: %.1f%%' % self._accuracy(test_prediction.eval(), test_labels))
+                        # print('Validation accuracy: %.1f%%' % self._accuracy(
+                        # valid_prediction.eval(), valid_labels))
                 print('Test accuracy: %.1f%%' % self._accuracy(test_prediction.eval(), test_labels))
 
 
