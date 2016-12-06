@@ -73,17 +73,13 @@ class Trainer:
                 convolutional_layer_1 = tf.nn.conv2d(data, layer1_weights, [1, 1, 1, 1], padding='SAME')
                 convolutional_layer_1 = tf.nn.bias_add(convolutional_layer_1, layer1_biases)
                 convolutional_layer_1 = tf.nn.relu(convolutional_layer_1)
-                hidden_1 = tf.nn.max_pool(convolutional_layer_1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+                hidden = tf.nn.max_pool(convolutional_layer_1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
                 
-                convolutional_layer_2 = tf.nn.conv2d(hidden_1, layer2_weights, [1, 1, 1, 1], padding='SAME')
-                convolutional_layer_2 = tf.nn.bias_add(convolutional_layer_2, layer2_biases)
-                convolutional_layer_2 = tf.nn.relu(convolutional_layer_2)
-                hidden_2 = tf.nn.max_pool(convolutional_layer_2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
-                
-                shape = hidden_2.get_shape().as_list()
-                reshape = tf.reshape(hidden_2, [shape[0], shape[1] * shape[2] * shape[3]])
+                conv = tf.nn.conv2d(hidden, layer2_weights, [1, 2, 2, 1], padding='SAME')
+                hidden = tf.nn.relu(conv + layer2_biases)
+                shape = hidden.get_shape().as_list()
+                reshape = tf.reshape(hidden, [shape[0], shape[1] * shape[2] * shape[3]])
                 hidden = tf.nn.relu(tf.matmul(reshape, layer3_weights) + layer3_biases)
-                
                 return tf.matmul(hidden, layer4_weights) + layer4_biases
           
           # Training computation.
@@ -98,7 +94,7 @@ class Trainer:
             train_prediction = tf.nn.softmax(logits)
             test_prediction = tf.nn.softmax(model(tf_test_dataset))
 
-            num_steps = 1001
+            num_steps = 100
 
             with tf.Session(graph=graph) as session:
                 tf.initialize_all_variables().run()
