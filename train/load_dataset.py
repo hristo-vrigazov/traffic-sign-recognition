@@ -32,13 +32,12 @@ def grayscale(img):
 
 
 def load_grayscale():
-    X_train, y_train, X_test, y_test, X_validation, y_validation = load_dataset()
+    X_train, y_train, X_test, y_test = load_dataset()
 
     X_train = np.array([grayscale(img) for img in X_train]).reshape(-1,32,32,1)
     X_test = np.array([grayscale(img) for img in X_test]).reshape(-1,32,32,1)
 
-    return X_train, y_train, X_test, y_test, X_validation, y_validation
-
+    return X_train, y_train, X_test, y_test
 
 def shuffle_in_unison(a, b):
     assert len(a) == len(b)
@@ -68,14 +67,12 @@ def load_dataset():
 
     validation_test_limit = int(len(test['features']) * 9.0 / 10.0)
     X_train, y_train = train['features'], train['labels']
-    X_test, y_test = test['features'][:validation_test_limit], test['labels'][:validation_test_limit]
-    X_validation, y_validation = test['features'][validation_test_limit:], test['labels'][validation_test_limit:]
+    X_test, y_test = test['features'], test['labels']
     
     del train
     del test
 
     X_train, y_train = shuffle_in_unison(X_train, y_train)
     X_test, y_test = shuffle_in_unison(X_test, y_test)
-    X_validation, y_validation = shuffle_in_unison(X_validation, y_validation)
 
-    return X_train, y_train, X_test, y_test, X_validation, y_validation
+    return X_train, y_train, X_test, y_test

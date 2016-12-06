@@ -7,7 +7,7 @@ import numpy as np
 class Trainer:
 
     def __init__(self, dataset_loading_function):
-        self.X_train, self.y_train, self.X_test, self.y_test, self.X_validation, self.y_validation = dataset_loading_function()
+        self.X_train, self.y_train, self.X_test, self.y_test = dataset_loading_function()
         self.n_train = len(self.X_train)
         self.n_test = len(self.X_test)
         self.image_size = self.X_train[0].shape[0]
@@ -16,7 +16,6 @@ class Trainer:
 
         print('Training examples: {}'.format(len(self.X_train)))
         print('Test examples: {}'.format(len(self.X_test)))
-        print('Validation examples: {}'.format(len(self.X_validation)))
 
     def _reformat(self, dataset, labels):
         dataset = dataset.reshape(
@@ -37,10 +36,8 @@ class Trainer:
         print('Num channels {}'.format(num_channels))
 
         train_dataset, train_labels = self._reformat(self.X_train, self.y_train)
-        valid_dataset, valid_labels = self._reformat(self.X_validation, self.y_validation)
         test_dataset, test_labels = self._reformat(self.X_test, self.y_test)
         print('Training set', train_dataset.shape, train_labels.shape)
-        print('Validation set', valid_dataset.shape, valid_labels.shape)
         print('Test set', test_dataset.shape, test_labels.shape)
 
         batch_size = 128
@@ -55,7 +52,6 @@ class Trainer:
             # Input data.
             tf_train_dataset = tf.placeholder(tf.float32, shape=(batch_size, image_size, image_size, num_channels))
             tf_train_labels = tf.placeholder(tf.float32, shape=(batch_size, num_labels))
-            tf_valid_dataset = tf.constant(valid_dataset)
             tf_test_dataset = tf.constant(test_dataset)
           
             # Initialize variables
@@ -93,7 +89,6 @@ class Trainer:
           
           # Predictions for the training, validation, and test data.
             train_prediction = tf.nn.softmax(logits)
-            valid_prediction = tf.nn.softmax(model(tf_valid_dataset))
             test_prediction = tf.nn.softmax(model(tf_test_dataset))
 
             num_steps = 1001
