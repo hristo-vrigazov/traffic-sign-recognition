@@ -70,8 +70,11 @@ class Trainer:
           
             # Model.
             def model(data):
-                conv = tf.nn.conv2d(data, layer1_weights, [1, 2, 2, 1], padding='SAME')
-                hidden = tf.nn.relu(conv + layer1_biases)
+                convolutional_layer_1 = tf.nn.conv2d(data, layer1_weights, [1, 1, 1, 1], padding='SAME')
+                convolutional_layer_1 = tf.nn.bias_add(convolutional_layer_1, layer1_biases)
+                convolutional_layer_1 = tf.nn.relu(convolutional_layer_1)
+                hidden = tf.nn.max_pool(convolutional_layer_1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+                
                 conv = tf.nn.conv2d(hidden, layer2_weights, [1, 2, 2, 1], padding='SAME')
                 hidden = tf.nn.relu(conv + layer2_biases)
                 shape = hidden.get_shape().as_list()
