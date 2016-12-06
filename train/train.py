@@ -40,7 +40,7 @@ class Trainer:
         print('Training set', train_dataset.shape, train_labels.shape)
         print('Test set', test_dataset.shape, test_labels.shape)
 
-        batch_size = 8
+        batch_size = 128
         patch_size = 5
         depth = 16
         num_hidden = 64
@@ -73,14 +73,17 @@ class Trainer:
                 convolutional_layer_1 = tf.nn.conv2d(data, layer1_weights, [1, 1, 1, 1], padding='SAME')
                 convolutional_layer_1 = tf.nn.bias_add(convolutional_layer_1, layer1_biases)
                 convolutional_layer_1 = tf.nn.relu(convolutional_layer_1)
-                hidden = tf.nn.max_pool(convolutional_layer_1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+                hidden_1 = tf.nn.max_pool(convolutional_layer_1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
                 
-                conv = tf.nn.conv2d(hidden, layer2_weights, [1, 2, 2, 1], padding='SAME')
-                hidden = tf.nn.relu(conv + layer2_biases)
-                shape = hidden.get_shape().as_list()
-                reshape = tf.reshape(hidden, [shape[0], shape[1] * shape[2] * shape[3]])
-                hidden = tf.nn.relu(tf.matmul(reshape, layer3_weights) + layer3_biases)
-                return tf.matmul(hidden, layer4_weights) + layer4_biases
+                convolutional_layer_2 = tf.nn.conv2d(hidden_1, layer2_weights, [1, 2, 2, 1], padding='SAME')
+                convolutional_layer_2 = tf.nn.bias_add(convolutional_layer_2, layer2_biases)
+                convolutional_layer_2 = tf.nn.relu(convolutional_layer_2)
+                hidden_2 = tf.nn.max_pool(convolutional_layer_2, ksize=[1, 1, 1, 1], strides=[1, 1, 1, 1], padding='SAME')
+
+                shape = hidden_2.get_shape().as_list()
+                reshape = tf.reshape(hidden_2, [shape[0], shape[1] * shape[2] * shape[3]])
+                hidden_2 = tf.nn.relu(tf.matmul(reshape, layer3_weights) + layer3_biases)
+                return tf.matmul(hidden_2, layer4_weights) + layer4_biases
           
           # Training computation.
             logits = model(tf_train_dataset)
@@ -94,7 +97,7 @@ class Trainer:
             train_prediction = tf.nn.softmax(logits)
             test_prediction = tf.nn.softmax(model(tf_test_dataset))
 
-            num_steps = 100
+            num_steps = 10 * int(len(train_dataset) / batch_size)
 
             with tf.Session(graph=graph) as session:
                 tf.initialize_all_variables().run()
