@@ -17,6 +17,8 @@ print("Image data shape =", image_shape)
 print("Number of classes =", n_classes)
 
 image = X_train[10]
+print(image)
+
 (B, G, R) = cv2.split(image)
 
 cv2.imshow("Red", R)

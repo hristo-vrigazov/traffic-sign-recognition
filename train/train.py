@@ -97,7 +97,7 @@ class Trainer:
             train_prediction = tf.nn.softmax(logits)
             test_prediction = tf.nn.softmax(model(tf_test_dataset))
 
-            num_steps = 8 * int(len(train_dataset) / batch_size)
+            num_steps = 10 * int(len(train_dataset) / batch_size)
 
             with tf.Session(graph=graph) as session:
                 tf.initialize_all_variables().run()

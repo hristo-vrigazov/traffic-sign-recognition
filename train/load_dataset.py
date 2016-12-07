@@ -75,4 +75,7 @@ def load_dataset():
     X_train, y_train = shuffle_in_unison(X_train, y_train)
     X_test, y_test = shuffle_in_unison(X_test, y_test)
 
+    X_train = np.array([img/255.0 for img in X_train])
+    X_test = np.array([img/255.0 for img in X_test])
+
     return X_train, y_train, X_test, y_test
