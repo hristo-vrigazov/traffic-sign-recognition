@@ -59,7 +59,7 @@ class Trainer:
                 [patch_size, patch_size, num_channels, depth], stddev=0.001))
             layer1_biases = tf.Variable(tf.zeros([depth]))
             layer2_weights = tf.Variable(tf.truncated_normal(
-              [patch_size, patch_size, depth, depth], stddev=0.1))
+              [patch_size, patch_size, depth, depth], stddev=0.001))
             layer2_biases = tf.Variable(tf.constant(1.0, shape=[depth]))
             layer3_weights = tf.Variable(tf.truncated_normal(
               [image_size // 4 * image_size // 4 * depth, num_hidden], stddev=0.001))
@@ -73,12 +73,12 @@ class Trainer:
                 convolutional_layer_1 = tf.nn.conv2d(data, layer1_weights, [1, 1, 1, 1], padding='SAME')
                 convolutional_layer_1 = tf.nn.bias_add(convolutional_layer_1, layer1_biases)
                 convolutional_layer_1 = tf.nn.relu(convolutional_layer_1)
-                hidden_1 = tf.nn.max_pool(convolutional_layer_1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+                hidden_1 = tf.nn.max_pool(convolutional_layer_1, ksize=[1, 4, 4, 1], strides=[1, 2, 2, 1], padding='SAME')
                 
                 convolutional_layer_2 = tf.nn.conv2d(hidden_1, layer2_weights, [1, 2, 2, 1], padding='SAME')
                 convolutional_layer_2 = tf.nn.bias_add(convolutional_layer_2, layer2_biases)
                 convolutional_layer_2 = tf.nn.relu(convolutional_layer_2)
-                hidden_2 = tf.nn.max_pool(convolutional_layer_2, ksize=[1, 1, 1, 1], strides=[1, 1, 1, 1], padding='SAME')
+                hidden_2 = tf.nn.max_pool(convolutional_layer_2, ksize=[1, 4, 4, 1], strides=[1, 1, 1, 1], padding='SAME')
 
                 shape = hidden_2.get_shape().as_list()
                 reshape = tf.reshape(hidden_2, [shape[0], shape[1] * shape[2] * shape[3]])
@@ -91,13 +91,13 @@ class Trainer:
                 tf.nn.softmax_cross_entropy_with_logits(logits, tf_train_labels))
             
           # Optimizer.
-            optimizer = tf.train.GradientDescentOptimizer(0.001).minimize(loss)
+            optimizer = tf.train.AdamOptimizer().minimize(loss)
           
           # Predictions for the training, validation, and test data.
             train_prediction = tf.nn.softmax(logits)
             test_prediction = tf.nn.softmax(model(tf_test_dataset))
 
-            num_steps = 10 * int(len(train_dataset) / batch_size)
+            num_steps = 8 * int(len(train_dataset) / batch_size)
 
             with tf.Session(graph=graph) as session:
                 tf.initialize_all_variables().run()
