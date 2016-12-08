@@ -1,5 +1,6 @@
 from load_dataset import load_dataset
 from load_dataset import load_grayscale
+from load_dataset import load_grayscale_normalized
 
 import tensorflow as tf
 import numpy as np
@@ -97,7 +98,7 @@ class Trainer:
             train_prediction = tf.nn.softmax(logits)
             test_prediction = tf.nn.softmax(model(tf_test_dataset))
 
-            num_steps = 10 * int(len(train_dataset) / batch_size)
+            num_steps =  int(len(train_dataset) / batch_size)
 
             with tf.Session(graph=graph) as session:
                 tf.initialize_all_variables().run()
@@ -108,14 +109,13 @@ class Trainer:
                     batch_labels = train_labels[offset:(offset + batch_size), :]
                     feed_dict = {tf_train_dataset : batch_data, tf_train_labels : batch_labels}
                     _, l, predictions = session.run([optimizer, loss, train_prediction], feed_dict=feed_dict)
-                    if (step % 50 == 0):
+                    if (step % 10 == 0):
                         print('Minibatch loss at step %d: %f' % (step, l))
                         print('Minibatch accuracy: %.1f%%' % self._accuracy(predictions, batch_labels))
-                        print('Test accuracy: %.1f%%' % self._accuracy(test_prediction.eval(), test_labels))
                         # print('Validation accuracy: %.1f%%' % self._accuracy(
                         # valid_prediction.eval(), valid_labels))
                 print('Test accuracy: %.1f%%' % self._accuracy(test_prediction.eval(), test_labels))
 
 
 if __name__ == "__main__":
-    Trainer(load_grayscale).train()
+    Trainer(load_grayscale_normalized).train()

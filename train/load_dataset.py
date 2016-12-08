@@ -39,6 +39,13 @@ def load_grayscale():
 
     return X_train, y_train, X_test, y_test
 
+
+def load_grayscale_normalized():
+    X_train, y_train, X_test, y_test = load_grayscale()
+    X_train = np.array([img for img in X_train])
+    X_test = np.array([img for img in X_test])
+    return X_train, y_train, X_test, y_test
+
 def shuffle_in_unison(a, b):
     assert len(a) == len(b)
     shuffled_a = np.empty(a.shape, dtype=a.dtype)
@@ -49,6 +56,11 @@ def shuffle_in_unison(a, b):
         shuffled_b[new_index] = b[old_index]
     return shuffled_a, shuffled_b
 
+def load_normalized_dataset():
+    X_train, y_train, X_test, y_test = load_dataset()
+    X_train = np.array([img for img in X_train])
+    X_test = np.array([img for img in X_test])
+    return X_train, y_train, X_test, y_test
 
 def load_dataset():
     training_file = 'train.p'
@@ -74,8 +86,5 @@ def load_dataset():
 
     X_train, y_train = shuffle_in_unison(X_train, y_train)
     X_test, y_test = shuffle_in_unison(X_test, y_test)
-
-    X_train = np.array([img/255.0 for img in X_train])
-    X_test = np.array([img/255.0 for img in X_test])
 
     return X_train, y_train, X_test, y_test
