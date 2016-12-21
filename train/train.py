@@ -74,12 +74,12 @@ class Trainer:
                 convolutional_layer_1 = tf.nn.conv2d(data, layer1_weights, [1, 1, 1, 1], padding='SAME')
                 convolutional_layer_1 = tf.nn.bias_add(convolutional_layer_1, layer1_biases)
                 convolutional_layer_1 = tf.nn.relu(convolutional_layer_1)
-                hidden_1 = tf.nn.max_pool(convolutional_layer_1, ksize=[1, 4, 4, 1], strides=[1, 2, 2, 1], padding='SAME')
+                hidden_1 = tf.nn.max_pool(convolutional_layer_1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
                 
                 convolutional_layer_2 = tf.nn.conv2d(hidden_1, layer2_weights, [1, 2, 2, 1], padding='SAME')
                 convolutional_layer_2 = tf.nn.bias_add(convolutional_layer_2, layer2_biases)
                 convolutional_layer_2 = tf.nn.relu(convolutional_layer_2)
-                hidden_2 = tf.nn.max_pool(convolutional_layer_2, ksize=[1, 4, 4, 1], strides=[1, 1, 1, 1], padding='SAME')
+                hidden_2 = tf.nn.max_pool(convolutional_layer_2, ksize=[1, 2, 2, 1], strides=[1, 1, 1, 1], padding='SAME')
 
                 shape = hidden_2.get_shape().as_list()
                 reshape = tf.reshape(hidden_2, [shape[0], shape[1] * shape[2] * shape[3]])
@@ -98,7 +98,9 @@ class Trainer:
             train_prediction = tf.nn.softmax(logits)
             test_prediction = tf.nn.softmax(model(tf_test_dataset))
 
-            num_steps =  int(len(train_dataset) / batch_size)
+
+            nb_epochs = 1
+            num_steps =  int(len(train_dataset) / batch_size) * nb_epochs
 
             with tf.Session(graph=graph) as session:
                 tf.initialize_all_variables().run()
@@ -112,8 +114,7 @@ class Trainer:
                     if (step % 10 == 0):
                         print('Minibatch loss at step %d: %f' % (step, l))
                         print('Minibatch accuracy: %.1f%%' % self._accuracy(predictions, batch_labels))
-                        # print('Validation accuracy: %.1f%%' % self._accuracy(
-                        # valid_prediction.eval(), valid_labels))
+                        print('Test accuracy: %.1f%%' % self._accuracy(test_prediction.eval(), test_labels))
                 print('Test accuracy: %.1f%%' % self._accuracy(test_prediction.eval(), test_labels))
 
 

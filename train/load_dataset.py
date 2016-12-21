@@ -7,6 +7,7 @@ import cv2
 import zipfile
 import numpy as np
 
+from sklearn.model_selection import train_test_split
 
 def unzip(source_filename, dest_dir):
     with zipfile.ZipFile(source_filename) as zf:
@@ -42,8 +43,8 @@ def load_grayscale():
 
 def load_grayscale_normalized():
     X_train, y_train, X_test, y_test = load_grayscale()
-    X_train = np.array([img for img in X_train])
-    X_test = np.array([img for img in X_test])
+    X_train = np.array([img/255.0 for img in X_train])
+    X_test = np.array([img/255.0 for img in X_test])
     return X_train, y_train, X_test, y_test
 
 def shuffle_in_unison(a, b):
@@ -58,8 +59,8 @@ def shuffle_in_unison(a, b):
 
 def load_normalized_dataset():
     X_train, y_train, X_test, y_test = load_dataset()
-    X_train = np.array([img for img in X_train])
-    X_test = np.array([img for img in X_test])
+    X_train = np.array([img/255.0 for img in X_train])
+    X_test = np.array([img/255.0 for img in X_test])
     return X_train, y_train, X_test, y_test
 
 def load_dataset():
@@ -88,3 +89,10 @@ def load_dataset():
     X_test, y_test = shuffle_in_unison(X_test, y_test)
 
     return X_train, y_train, X_test, y_test
+    
+def load_train_test_val():
+    X_train, y_train, X_test, y_test = load_normalized_dataset()
+    
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=7)
+    return X_train, y_train, X_test, y_test, X_val, y_val
+    
